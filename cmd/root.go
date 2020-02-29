@@ -1,4 +1,4 @@
-package main
+package cmd
 
 import (
 	"fmt"
@@ -14,7 +14,7 @@ var (
 	}
 )
 
-func execute() {
+func Execute() {
 	if err := rootCmd.Execute(); err != nil {
 		_ = fmt.Errorf("Error: %v, ", err)
 		os.Exit(1)

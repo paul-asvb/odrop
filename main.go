@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"github.com/ASVBPREAUBV/orthanc-drop/cmd"
 	"github.com/imroc/req"
 	"os"
 	"path/filepath"
@@ -19,7 +20,7 @@ func getAuthheader() string {
 }
 
 func main() {
-	execute()
+	cmd.Execute()
 	upload()
 }
 
