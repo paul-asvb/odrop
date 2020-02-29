@@ -7,6 +7,7 @@ import (
 	"github.com/imroc/req"
 	"os"
 	"path/filepath"
+	"github.com/spf13/viper"
 )
 
 var dirToUpload = "./test"
@@ -20,8 +21,22 @@ func getAuthheader() string {
 }
 
 func main() {
+	readConfig()
 	cmd.Execute()
 	upload()
+}
+
+func readConfig() {
+	viper.SetDefault("dir", ".")
+
+	viper.SetConfigName("orthanc-drop")         // name of config file (without extension)
+	viper.SetConfigType("yaml")           // REQUIRED if the config file does not have the extension in the name
+	viper.AddConfigPath(".")              // optionally look for config in the working directory
+	err := viper.ReadInConfig()           // Find and read the config file
+	if err != nil { // Handle errors reading the config file
+		viper.SafeWriteConfig()
+		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	}
 }
 
 func upload() {
