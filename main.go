@@ -14,7 +14,7 @@ type orthancConfig struct {
 	url      string
 }
 
-func getAuthheader(user, pass string) string {
+func getAuthHeader(user, pass string) string {
 	auth := user + ":" + pass
 	return "Basic " + base64.StdEncoding.EncodeToString([]byte(auth))
 }
@@ -26,22 +26,24 @@ func main() {
 }
 
 func readConfig() {
+
+	viper.SetConfigName("orthanc-drop")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
 	viper.SetDefault("dir", ".")
 	viper.SetDefault("user", "")
 	viper.SetDefault("password", "")
 	viper.SetDefault("url", "http://localhost:8080/")
+
+	viper.WriteConfig()
+
 	fmt.Println("----used config file:----")
 	fmt.Println(viper.ConfigFileUsed())
 	fmt.Println("-------------------------")
 	config := orthancConfig{}
 	viper.Unmarshal(config)
-
-	viper.SetConfigName("orthanc-drop") // name of config file (without extension)
-	viper.SetConfigType("yaml")         // REQUIRED if the config file does not have the extension in the name
-	viper.AddConfigPath(".")            // optionally look for config in the working directory
-	err := viper.ReadInConfig()         // Find and read the config file
+	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil { // Handle errors reading the config file
-		viper.SafeWriteConfig()
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
 }
