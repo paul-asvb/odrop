@@ -8,10 +8,10 @@ import (
 )
 
 type orthancConfig struct {
-	dir      string
-	user     string
-	password string
-	url      string
+	Dir      string
+	User     string
+	Password string
+	Url      string
 }
 
 func getAuthHeader(user, pass string) string {
@@ -30,22 +30,25 @@ func readConfig() {
 	viper.SetConfigName("orthanc-drop")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
+
 	viper.SetDefault("dir", ".")
-	viper.SetDefault("user", "")
-	viper.SetDefault("password", "")
+	viper.SetDefault("user", "user")
+	viper.SetDefault("password", "pass")
 	viper.SetDefault("url", "http://localhost:8080/")
 
+	config := orthancConfig{}
+	viper.Unmarshal(&config)
+	fmt.Println(config)
 	viper.WriteConfig()
 
-	fmt.Println("----used config file:----")
-	fmt.Println(viper.ConfigFileUsed())
-	fmt.Println("-------------------------")
-	config := orthancConfig{}
-	viper.Unmarshal(config)
 	err := viper.ReadInConfig() // Find and read the config file
 	if err != nil { // Handle errors reading the config file
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	}
+
+	fmt.Println("----used config file:----")
+	fmt.Println(viper.ConfigFileUsed())
+	fmt.Println("-------------------------")
 }
 
 /*func upload() {
