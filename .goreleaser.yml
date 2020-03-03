@@ -1,0 +1,12 @@
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - id: "odrop"
+    binary: odrop
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "odrop-{{ .Tag }}-next"
+changelog:
+  sort: asc
