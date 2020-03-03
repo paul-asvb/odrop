@@ -4,7 +4,10 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/ASVBPREAUBV/orthanc-drop/cmd"
+	"github.com/imroc/req"
 	"github.com/spf13/viper"
+	"os"
+	"path/filepath"
 )
 
 type orthancConfig struct {
@@ -22,7 +25,6 @@ func getAuthHeader(user, pass string) string {
 func main() {
 	readConfig()
 	cmd.Execute()
-	//upload()
 }
 
 func readConfig() {
@@ -34,25 +36,32 @@ func readConfig() {
 	viper.SetDefault("dir", ".")
 	viper.SetDefault("user", "user")
 	viper.SetDefault("password", "pass")
-	viper.SetDefault("url", "http://localhost:8080/")
+	viper.SetDefault("url", "http://localhost:8080/instances")
+
+	viper.ReadInConfig()
 
 	config := orthancConfig{}
 	viper.Unmarshal(&config)
-	fmt.Println(config)
-	viper.WriteConfig()
 
-	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil { // Handle errors reading the config file
+	fmt.Println(config)
+
+	err := viper.ReadInConfig()
+	if err != nil {
+		viper.WriteConfig()
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+	} else {
+
+		fmt.Println("----used config file:----")
+		fmt.Println(viper.ConfigFileUsed())
+		fmt.Println("-------------------------")
+		upload(config)
+
 	}
 
-	fmt.Println("----used config file:----")
-	fmt.Println(viper.ConfigFileUsed())
-	fmt.Println("-------------------------")
 }
 
-/*func upload() {
-	fmt.Print("DIR: ", dirToUpload)
+func upload(config orthancConfig) {
+	dirToUpload := config.Dir
 	if _, err := os.Stat(dirToUpload); os.IsNotExist(err) {
 		panic("DIR does not exist : " + dirToUpload)
 	}
@@ -69,13 +78,13 @@ func readConfig() {
 		//if filepath.Ext(file) == ".dcm" {
 		header := req.Header{
 			"Accept":        "application/json",
-			"Authorization": getAuthheader(),
+			"Authorization": getAuthHeader(config.User, config.Password),
 			"Content-Type":  "application/dicom",
 		}
 
 		file, _ := os.Open(file)
 
-		res, err := req.Post(hostUrl, req.FileUpload{
+		res, err := req.Post(config.Url, req.FileUpload{
 			File: file,
 		}, header)
 
@@ -83,4 +92,4 @@ func readConfig() {
 		//}
 	}
 
-}*/
+}
