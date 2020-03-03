@@ -29,7 +29,7 @@ func main() {
 
 func readConfig() {
 
-	viper.SetConfigName("orthanc-drop")
+	viper.SetConfigName("odrop")
 	viper.SetConfigType("yaml")
 	viper.AddConfigPath(".")
 
@@ -47,6 +47,7 @@ func readConfig() {
 
 	err := viper.ReadInConfig()
 	if err != nil {
+		os.Create("./odrop.yml")
 		viper.WriteConfig()
 		panic(fmt.Errorf("Fatal error config file: %s \n", err))
 	} else {
