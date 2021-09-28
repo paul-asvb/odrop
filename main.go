@@ -3,11 +3,12 @@ package main
 import (
 	"encoding/base64"
 	"fmt"
+	"os"
+	"path/filepath"
+
 	"github.com/ASVBPREAUBV/orthanc-drop/cmd"
 	"github.com/imroc/req"
 	"github.com/spf13/viper"
-	"os"
-	"path/filepath"
 )
 
 type orthancConfig struct {
@@ -49,7 +50,9 @@ func readConfig() {
 	if err != nil {
 		os.Create("./odrop.yml")
 		viper.WriteConfig()
-		panic(fmt.Errorf("Fatal error config file: %s \n", err))
+		fmt.Println("-------------------------")
+		fmt.Println("no config file available, i created one for you. (./odrop.yml)")
+		fmt.Println("-------------------------")
 	} else {
 
 		fmt.Println("----used config file:----")
@@ -76,21 +79,23 @@ func upload(config orthancConfig) {
 		panic(err)
 	}
 	for _, file := range files {
-		//if filepath.Ext(file) == ".dcm" {
-		header := req.Header{
-			"Accept":        "application/json",
-			"Authorization": getAuthHeader(config.User, config.Password),
-			"Content-Type":  "application/dicom",
+		info, _ := os.Stat(file)
+		if !info.IsDir() {
+			header := req.Header{
+				"Accept":        "application/json",
+				"Authorization": getAuthHeader(config.User, config.Password),
+				"Content-Type":  "application/dicom",
+			}
+
+			file, _ := os.Open(file)
+			fmt.Println("send file:", file)
+			res, err := req.Post(config.Url, req.FileUpload{
+				File: file,
+			}, header)
+
+			fmt.Print(res, err)
 		}
 
-		file, _ := os.Open(file)
-
-		res, err := req.Post(config.Url, req.FileUpload{
-			File: file,
-		}, header)
-
-		fmt.Print(res, err)
-		//}
 	}
 
 }
